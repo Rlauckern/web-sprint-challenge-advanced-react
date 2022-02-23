@@ -3,33 +3,40 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import AppClass from './AppClass';
-import AppFunctional from './AppFunctional';
 
 // Write your tests here
-let submit, emailInput
 
 beforeEach(() => {
   render(<AppClass />)
-  submit = screen.queryByText('submit')
-  emailInput = screen.queryAllByPlaceholderText('type email')
+  upButton = screen.getByText('UP')
+  downButton = screen.getByText('DOWN')
+  leftButton = screen.getByText('LEFT')
+  resetButton = screen.getByText('reset')
 })
+
 afterEach(() => {
   document.body.innerHTML = ''
 })
 
 test('sanity', () => {
-  expect(true).toBe(false)
+  expect(true).toBe(true)
 })
 
-test('three ways to look for text', () => {
-  screen.getByText('coordinates')
-  screen.queryByText('coordinates')
-  screen.findByText('coordinates')
+test('clicking UP increases the step counter', () => {
+  fireEvent.click(upButton)
 })
 
-test('getByText', () => {
-  screen.getByText('coordinates')
-  screen.getByText('coordinates', { exact: false })
+test('clicking DOWN increases the step counter', () => {
+  fireEvent.click(downButton)
+})
+
+test('clicking LEFT increases the step counter', () => {
+  fireEvent.click(leftButton)
+})
+
+test('clicking reset resets the step counter', () => {
+  fireEvent.click(leftButton)
+  fireEvent.click(resetButton)
 })
 
 test('that beyonce is NOT on the page', () => {

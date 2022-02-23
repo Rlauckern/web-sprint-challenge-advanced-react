@@ -2,106 +2,173 @@ import React from 'react'
 import axios from 'axios';
 
 export default class AppClass extends React.Component {
-  // constructor(props) {
-  //   super(props);
-
-    state = {
-      form: [{ x: 2, y: 2, steps: 0 }],
-      email: '',
-      error: '',
-    }
-  
-
-  // moveSqDown = () => {
-  //   this.setState({ yoffset: this.state.yoffset + this.state.delta });
-  // }
-
-  // moveSqUp = () => {
-  //   this.setState({ yoffset: this.state.yoffset - this.state.delta });
-  // }
-
-  // moveSqRight = () => {
-  //   this.setState({ xoffset: this.state.xoffset + this.state.delta });
-  // }
-
-  // moveSqLeft = () => {
-  //   this.setState({ xoffset: this.state.xoffset - this.state.delta });
-  // }
-
-  // componentDidMount() {
-  //   axios.get('http://localhost:9000/api/result')
-  //   .then(res => {
-  //     console.log(res);
-  //     this.setState({
-  //       ...this.state,
-  //       form: res.data.,
-  //     })
-  //   })
-  //   .catch(err => {
-  //     console.error(err);
-  //   })
-  // }
-
-  onChange = evt => {
-    const { value, steps } = evt.target;
-    this.setState({ ...this.state, [steps]: value })
+  state = {
+    x: 2,
+    y: 2,
+    steps: 0,
+    email: '',
+    message: ''
   }
 
-  onSubmit = evt => {
+  // handle change, submit, reset
+  handleSubmit = evt => {
     evt.preventDefault()
-    const payload = { email: this.state.email };
+    const payload = {
+      x: this.state.x,
+      y: this.state.y,
+      steps: this.state.steps,
+      email: this.state.email
+    }
     axios.post('http://localhost:9000/api/result', payload)
       .then(res => {
-        console.log(res)
-        this.setState({ ...this.state, form: res.data.email })
+        this.setState({
+          ...this.state,
+          email: '',
+          message: res.data.message
+        })
       })
       .catch(err => {
-        console.error(err);
-      })
+        console.log(err.response)
+        this.state.email !== '' & this.state.email !== 'foo@bar.baz' ?
+        this.setState({
+          ...this.state, message: 'Ouch: email must be a valid email'
+        }) :
+        this.state.email === 'foo@bar.baz' ?
+        this.setState({
+          ...this.state,
+          email: '',
+          message: err.response.data.message
+        }) :
+        this.setState({
+          ...this.state,
+          message: 'Ouch: email is required'
+        });
+      });
   }
 
-  reset = () => {
-    this.setState({ 
+  handleChange = evt => {
+    this.setState({
+      ...this.state, email: evt.target.value
+    });
+  }
+
+  handleReset = () => {
+    this.setState({
       ...this.state,
-      form: [{ x: 2, y: 2, steps: 0 }],
+      x: 2,
+      y: 2,
+      steps: 0,
       email: '',
-      error: '',
-    })
+      message: ''
+    });
+  }
+
+  // axis movement
+  handleXAdd = () => {
+    this.state.x <= 2 ?
+    this.setState({
+      ...this.state,
+      x: this.state.x + 1,
+      steps: this.state.steps + 1,
+      message: ''
+    }) :
+    this.setState({ ...this.state, message: "You can't go right" });
+  }
+
+  handleXMinus = () => {
+    this.state.x >= 2 ?
+    this.setState({
+      ...this.state,
+      x: this.state.x -1,
+      steps: this.state.steps + 1,
+      message: ''
+    }) :
+    this.setState({ ...this.state, message: "You can't go left" });
+  }
+
+  handleYAdd = () => {
+    this.state.y >= 2 ?
+    this.setState({
+      ...this.state,
+      y: this.state.y -1,
+      steps: this.state.steps + 1,
+      message: ''
+    }) :
+    this.setState({ ...this.state, message: "You can't go up" });
+  }
+
+  handleYMinus = () => {
+    this.state.y <= 2 ?
+    this.setState({
+      ...this.state,
+      y: this.state.y + 1,
+      steps: this.state.steps + 1,
+      message: ''
+    }) :
+    this.setState({ ...this.state, message: "You can't go down" });
   }
 
   render() {
-    // console.log(this.props)
-
     const { className } = this.props
     return (
       <div id="wrapper" className={className}>
+
         <div className="info">
-          <h3 id="coordinates">Coordinates (2, 2)</h3>
-          <h3 id="steps">You moved 0 times</h3>
+          <h3 id="coordinates">Coordinates ({this.state.x}, {this.state.y})</h3>
+          <h3 id="steps">You moved {this.state.steps} {this.state.steps === 1 ? 'time' : 'times'}</h3>
         </div>
+
         <div id="grid">
-          <div className="square"></div>
-          <div className="square"></div>
-          <div className="square"></div>
-          <div className="square"></div>
-          <div className="square active">B</div>
-          <div className="square"></div>
-          <div className="square"></div>
-          <div className="square"></div>
-          <div className="square"></div>
+          <div className= {this.state.x === 1 && this.state.y === 1 ? "square active" : "square"}>
+            {this.state.x === 1 && this.state.y === 1 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 2 && this.state.y === 1 ? "square active" : "square"}>
+            {this.state.x === 2 && this.state.y === 1 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 3 && this.state.y === 1 ? "square active" : "square"}>
+            {this.state.x === 3 && this.state.y === 1 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 1 && this.state.y === 2 ? "square active" : "square"}>
+            {this.state.x === 1 && this.state.y === 2 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 2 && this.state.y === 2 ? "square active" : "square"}>
+            {this.state.x === 2 && this.state.y === 2 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 3 && this.state.y === 2 ? "square active" : "square"}>
+            {this.state.x === 3 && this.state.y === 2 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 1 && this.state.y === 3 ? "square active" : "square"}>
+            {this.state.x === 1 && this.state.y === 3 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 2 && this.state.y === 3 ? "square active" : "square"}>
+            {this.state.x === 2 && this.state.y === 3 ? "B" : ''}
+          </div>
+
+          <div className= {this.state.x === 3 && this.state.y === 3 ? "square active" : "square"}>
+            {this.state.x === 3 && this.state.y === 3 ? "B" : ''}
+          </div>
         </div>
+
         <div className="info">
-          <h3 id="message"></h3>
+          <h3 id="message">{this.state.message}</h3>
         </div>
         <div id="keypad">
-          <button onClick={this.onChange} id="left">LEFT</button>
-          <button onClick={this.onChange} id="up">UP</button>
-          <button onClick={this.onChange} id="right">RIGHT</button>
-          <button onClick={this.onChange} id="down">DOWN</button>
-          <button onClick={this.reset} id="reset">reset</button>
+          <button onClick={this.handleXMinus} id="left">LEFT</button>
+          <button onClick={this.handleYAdd} id="up">UP</button>
+          <button onClick={this.handleXAdd} id="right">RIGHT</button>
+          <button onClick={this.handleYMinus} id="down">DOWN</button>
+          <button onClick={this.handleReset} id="reset">reset</button>
         </div>
-        <form onSubmit={this.onSubmit}>
-          <input onChange={this.onChange} value={this.state.email} id="email" type="email" placeholder="type email"></input>
+
+        <form onSubmit={this.handleSubmit}>
+          <input onChange={this.handleChange} value={this.state.email} id="email" type="email" placeholder="type email"></input>
           <input id="submit" type="submit"></input>
         </form>
       </div>
